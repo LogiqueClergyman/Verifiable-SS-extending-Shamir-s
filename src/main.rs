@@ -8,6 +8,9 @@ fn main() {
     // Dealer generates the polynomial
     let coefficients = create_polynomial(secret, threshold);
 
+    //Dealer generates the shares
+    let shares = create_shares(&coefficients, &players);
+    
     // Dealer encrypts the shares
     // let encrypted_shares = encrypt_shares();
 
@@ -41,8 +44,22 @@ fn create_polynomial(secret: i32, threshold: usize) -> Vec<i32> {
     coefficients
 }
 
-fn encrypt_shares(polynomial: &[i32], players: &[u8]) -> Vec<(u8, i32)> {
-    Vec::new()
+fn create_shares(coefficients: &Vec<i32>, players: &Vec<i32>) -> Vec<i32> {
+    let mut shares: Vec<i32> = Vec::new();
+    for player in players {
+        let mut share = 0;
+        for i in 0..coefficients.len() {
+            share += coefficients[i] * player.pow(i as u32);
+        }
+        shares.push((share));
+    }
+    shares
+}
+
+fn encrypt_shares(coefficients: &[i32], players: &[u8]) -> Vec<(u8, i32)> {
+    let mut encrypted_shares: Vec<(u8, i32)> = Vec::new();
+    for i in 
+    encrypted_shares
 }
 
 fn send_encrypted_shares(encrypted_shares: &[(u8, i32)]) {}
