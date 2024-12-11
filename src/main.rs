@@ -2,7 +2,7 @@ use rand::Rng;
 
 fn main() {
     let secret = 123;
-    let players = vec![1, 2, 3, 4, 5];
+    let players = vec![14, 21, 32, 45, 53];
     let threshold = 3;
 
     // Dealer generates the polynomial
@@ -11,7 +11,7 @@ fn main() {
     // Dealer generates the shares
     let shares = create_shares(&coefficients, &players);
 
-    // Dealer encrypts the shares (no actual encryption for now)
+    // Dealer encrypts the shares (abhi toh no encryption)
     let encrypted_shares = encrypt_shares(&shares, &players);
 
     // Dealer sends the encrypted shares to the users
@@ -27,7 +27,7 @@ fn main() {
     }
     println!("----------Shares verified by all players----------");
 
-    // Players decrypt the received shares
+    // Players decrypt the received shares (since no encryption, no decryption, at least abhi ke liye toh nhi)
     let mut decrypted_shares: Vec<(i32, i32)> = Vec::new();
     for (i, &encrypted_share) in encrypted_shares.iter().enumerate() {
         decrypted_shares.push((players[i], decrypt_received_share(encrypted_share)));
@@ -88,15 +88,13 @@ fn verify_received_share(
     for (i, &coeff) in coefficients.iter().enumerate() {
         expected_share += coeff * player_index.pow(i as u32);
     }
-    if received_encrypted_share == expected_share {
-        println!("Share verified by player {}", player_index);
-    } else {
+    match received_encrypted_share == expected_share {
+        true =>println!("Share verified by player {}", player_index),
+        false => {
         println!(
-            "Player {} received a faulty share: Expected {}, Got {}",
-            player_index, expected_share, received_encrypted_share
-        );
-        panic!("Dealer is corrupt");
-    }
+            "Player {} received a faulty share: Expected {}, Got {}", player_index, expected_share, received_encrypted_share);
+            panic!("Dealer is corrupt");
+        }
 }
 
 fn decrypt_received_share(received_encrypted_share: i32) -> i32 {
@@ -105,18 +103,23 @@ fn decrypt_received_share(received_encrypted_share: i32) -> i32 {
 
 fn broadcast_decrypted_shares(decrypted_shares: &Vec<(i32, i32)>) {
     for &(index, share) in decrypted_shares {
-        println!("Player {} broadcast: [index={} | share={}]", index, index, share);
+        println!(
+            "Player {} broadcast: [index={} | share={}]",
+            index, index, share
+        );
     }
     println!("----------Decrypted shares broadcasted----------");
 }
 
 fn reconstruct_secret(decrypted_shares: &Vec<(i32, i32)>, threshold: usize) -> i32 {
     let mut secret = 0;
-    for (j, &(xj, yj)) in decrypted_shares.iter().take(threshold).enumerate() {
+    for j in 0..threshold {
+        let (xj, yj) = decrypted_shares[j];
         let mut numerator = 1;
         let mut denominator = 1;
-        for (k, &(xk, _)) in decrypted_shares.iter().take(threshold).enumerate() {
+        for k in 0..threshold {
             if j != k {
+                let (xk, _) = decrypted_shares[k];
                 numerator *= -xk;
                 denominator *= xj - xk;
             }
