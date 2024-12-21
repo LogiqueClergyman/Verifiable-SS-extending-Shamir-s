@@ -64,6 +64,7 @@ fn create_shares(coefficients: &Vec<i32>, players: &Vec<i32>) -> Vec<i32> {
 }
 
 fn encrypt_shares(shares: &Vec<i32>, _players: &Vec<i32>) -> Vec<i32> {
+
     shares.clone() // No encryption for now
 }
 
@@ -95,6 +96,7 @@ fn verify_received_share(
             "Player {} received a faulty share: Expected {}, Got {}", player_index, expected_share, received_encrypted_share);
             panic!("Dealer is corrupt");
         }
+    }
 }
 
 fn decrypt_received_share(received_encrypted_share: i32) -> i32 {
